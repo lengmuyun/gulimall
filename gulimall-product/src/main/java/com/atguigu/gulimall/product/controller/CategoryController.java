@@ -76,6 +76,14 @@ public class CategoryController {
         return R.ok();
     }
 
+    @RequestMapping("/update/sort")
+    //@RequiresPermissions("product:category:update")
+    public R updateSort(@RequestBody CategoryEntity[] category){
+        categoryService.updateBatchById(Arrays.asList(category));
+
+        return R.ok();
+    }
+
     /**
      * 删除
      */
