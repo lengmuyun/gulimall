@@ -1,6 +1,6 @@
 package com.atguigu.gulimall.thirdparty.service.impl;
 
-import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.OSS;
 import com.aliyun.oss.common.utils.BinaryUtil;
 import com.aliyun.oss.model.MatchMode;
 import com.aliyun.oss.model.PolicyConditions;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class AliOSSServiceImpl implements OSSService {
 
     @Autowired
-    private OSSClient ossClient;
+    private OSS ossClient;
 
     @Value("${spring.cloud.alicloud.access-key}")
     private String accessId;
@@ -72,7 +72,7 @@ public class AliOSSServiceImpl implements OSSService {
      */
     private String getDir() {
         String format = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        return format + "/";
+        return format;
     }
 
     /**
