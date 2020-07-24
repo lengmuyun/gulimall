@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.product.service;
 
 import com.atguigu.common.utils.PageUtils;
+import com.atguigu.gulimall.product.entity.AttrGroupEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
 
@@ -21,6 +22,14 @@ public interface CategoryService extends IService<CategoryEntity> {
     List<CategoryEntity> listWithTree();
 
     void removeMenuByIds(List<Long> menuIds);
+
+    Long[] getCatelogPath(Long catelogId);
+
+    /**
+     * 级联更新，如果名称变更，则一同修改关联表中的分类名称
+     * @param category
+     */
+    void updateCascade(CategoryEntity category);
 
 }
 

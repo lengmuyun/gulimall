@@ -11,6 +11,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -33,15 +35,14 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Override
     public PageUtils queryPage(Map<String, Object> params, Long catelogId) {
-        QueryWrapper<AttrGroupEntity> queryWrapper;
-        if (catelogId == 0) {
-            queryWrapper = new QueryWrapper<>();
-        } else {
-            String key = (String) params.get("key");
-            queryWrapper = new QueryWrapper<AttrGroupEntity>().eq("catelog_id", catelogId);
-            if (!StringUtils.isEmpty(key)) {
-                queryWrapper.and(wrapper -> wrapper.eq("attr_group_id", key).or().like("attr_group_name", key));
-            }
+        QueryWrapper<AttrGroupEntity> queryWrapper = new QueryWrapper<>();
+        String key = (String) params.get("key");
+        if (!StringUtils.isEmpty(key)) {
+            queryWrapper.and(wrapper -> wrapper.eq("attr_group_id", key).or().like("attr_group_name", key));
+        }
+
+        if (catelogId != 0) {
+            queryWrapper.eq("catelog_id", catelogId);
         }
         return getPageUtils(params, queryWrapper);
     }
