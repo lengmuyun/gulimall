@@ -1,9 +1,12 @@
 package com.atguigu.gulimall.product.service;
 
 import com.atguigu.common.utils.PageUtils;
+import com.atguigu.gulimall.product.entity.AttrEntity;
+import com.atguigu.gulimall.product.vo.AttrRelationVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,6 +21,12 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     PageUtils queryPage(Map<String, Object> params, Long catelogId);
+
+    List<AttrEntity> attrRelation(Long attrgroupId);
+
+    void deleteAttrRelation(AttrRelationVo[] attrRelationList);
+
+    PageUtils noattrRelation(Map<String, Object> params, Long attrgroupId);
 
 }
 

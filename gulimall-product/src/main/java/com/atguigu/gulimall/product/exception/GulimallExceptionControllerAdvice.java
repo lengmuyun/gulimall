@@ -25,6 +25,7 @@ public class GulimallExceptionControllerAdvice {
     @ExceptionHandler(value = Exception.class)
     public R handleUnknowException(Exception e) {
         log.info("程序发生错误: {}", e.getMessage());
+        e.printStackTrace();
         return R.error();
     }
 

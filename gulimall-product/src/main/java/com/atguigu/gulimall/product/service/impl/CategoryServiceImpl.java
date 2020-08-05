@@ -4,6 +4,7 @@ import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
+import com.atguigu.gulimall.product.vo.AttrResponseVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -85,6 +86,15 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         // 分类名称变更则更新关联表中的分类名称
         if (!category.getName().equals(categoryEntity.getName())) {
             categoryBrandRelationService.updateCategoryName(category.getCatId(), category.getName());
+        }
+    }
+
+    @Override
+    public void fillCatelogName(AttrResponseVo attrResponseVo) {
+        Long catelogId = attrResponseVo.getCatelogId();
+        CategoryEntity categoryEntity = this.baseMapper.selectById(catelogId);
+        if (categoryEntity != null) {
+            attrResponseVo.setCatelogName(categoryEntity.getName());
         }
     }
 
