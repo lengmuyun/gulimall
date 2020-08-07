@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.product.entity;
 
+import com.atguigu.gulimall.product.vo.BrandVo;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -40,5 +41,12 @@ public class CategoryBrandRelationEntity implements Serializable {
 	 * 
 	 */
 	private String catelogName;
+
+	public BrandVo toBrandVo() {
+		BrandVo brandVo = new BrandVo();
+		brandVo.setBrandId(this.brandId);
+		brandVo.setBrandName(this.brandName);
+		return brandVo;
+	}
 
 }

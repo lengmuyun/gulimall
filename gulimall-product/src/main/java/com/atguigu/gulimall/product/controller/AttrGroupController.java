@@ -7,6 +7,7 @@ import java.util.Map;
 import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
 import com.atguigu.gulimall.product.service.CategoryService;
+import com.atguigu.gulimall.product.vo.AttrGroupWithAttrsVo;
 import com.atguigu.gulimall.product.vo.AttrRelationVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -69,7 +70,7 @@ public class AttrGroupController {
 
     @GetMapping("/{attrgroupId}/attr/relation")
     public R attrRelation(@PathVariable Long attrgroupId) {
-        List<AttrEntity> list = attrGroupService.attrRelation(attrgroupId);
+        List<AttrEntity> list = attrGroupService.getAttrListByAttrGroupId(attrgroupId);
         return R.ok().put("data", list);
     }
 
@@ -95,6 +96,13 @@ public class AttrGroupController {
         attrAttrgroupRelationService.saveAttrRelation(relationVoList);
         return R.ok();
     }
+
+    @GetMapping("/{catelogId}/withattr")
+    public R getAttrGroupWithAttrs(@PathVariable Long catelogId) {
+        List<AttrGroupWithAttrsVo> list = attrGroupService.getAttrGroupWithAttrsByCatelogId(catelogId);
+        return R.ok().put("data", list);
+    }
+
 
     /**
      * 保存

@@ -3,8 +3,13 @@ package com.atguigu.gulimall.product.controller;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.atguigu.gulimall.product.dao.BrandDao;
+import com.atguigu.gulimall.product.entity.BrandEntity;
+import com.atguigu.gulimall.product.vo.BrandVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,6 +55,18 @@ public class CategoryBrandRelationController {
         PageUtils page = categoryBrandRelationService.queryPage(params);
 
         return R.ok().put("page", page);
+    }
+
+    /**
+     * 获取分类关联的品牌
+     * @param catId
+     * @return
+     */
+    @GetMapping("/brands/list")
+    public R brandslist(@RequestParam Long catId) {
+        List<CategoryBrandRelationEntity> list = categoryBrandRelationService.getRelatedBrand(catId);
+        List<BrandVo> result = list.stream().map(CategoryBrandRelationEntity::toBrandVo).collect(Collectors.toList());
+        return R.ok().put("data", result);
     }
 
 

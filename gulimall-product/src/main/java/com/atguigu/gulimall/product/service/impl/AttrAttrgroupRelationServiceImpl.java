@@ -2,10 +2,16 @@ package com.atguigu.gulimall.product.service.impl;
 
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
-import com.atguigu.gulimall.product.dao.AttrGroupDao;
+import com.atguigu.gulimall.product.dao.AttrAttrgroupRelationDao;
+import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
+import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
+import com.atguigu.gulimall.product.service.AttrGroupService;
 import com.atguigu.gulimall.product.vo.AttrRelationVo;
 import com.atguigu.gulimall.product.vo.AttrResponseVo;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,22 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
-import com.atguigu.gulimall.product.dao.AttrAttrgroupRelationDao;
-import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
-import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
-
-import javax.annotation.Resource;
-
 
 @Service("attrAttrgroupRelationService")
 public class AttrAttrgroupRelationServiceImpl extends ServiceImpl<AttrAttrgroupRelationDao, AttrAttrgroupRelationEntity> implements AttrAttrgroupRelationService {
 
     @Autowired
-    private AttrGroupDao attrGroupDao;
+    private AttrGroupService attrGroupService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -55,7 +51,7 @@ public class AttrAttrgroupRelationServiceImpl extends ServiceImpl<AttrAttrgroupR
                 new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrResponseVo.getAttrId())
         );
         if (attrAttrgroupRelationEntity != null && attrAttrgroupRelationEntity.getAttrGroupId() != null) {
-            AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrAttrgroupRelationEntity.getAttrGroupId());
+            AttrGroupEntity attrGroupEntity = attrGroupService.getById(attrAttrgroupRelationEntity.getAttrGroupId());
             attrResponseVo.setGroupName(attrGroupEntity.getAttrGroupName());
         }
     }
@@ -88,6 +84,11 @@ public class AttrAttrgroupRelationServiceImpl extends ServiceImpl<AttrAttrgroupR
         AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
         BeanUtils.copyProperties(vo, attrAttrgroupRelationEntity);
         return attrAttrgroupRelationEntity;
+    }
+
+    @Override
+    public void deleteBatch(List<AttrRelationVo> attrRelationList) {
+        this.baseMapper.deleteBatch(attrRelationList);
     }
 
 }

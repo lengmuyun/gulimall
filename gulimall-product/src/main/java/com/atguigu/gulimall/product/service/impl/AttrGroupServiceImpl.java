@@ -3,17 +3,19 @@ package com.atguigu.gulimall.product.service.impl;
 import com.atguigu.common.constant.product.AttrEnum;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
-import com.atguigu.gulimall.product.dao.AttrAttrgroupRelationDao;
 import com.atguigu.gulimall.product.dao.AttrGroupDao;
 import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
+import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
 import com.atguigu.gulimall.product.service.AttrGroupService;
 import com.atguigu.gulimall.product.service.AttrService;
+import com.atguigu.gulimall.product.vo.AttrGroupWithAttrsVo;
 import com.atguigu.gulimall.product.vo.AttrRelationVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -30,7 +32,7 @@ import java.util.stream.Collectors;
 public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEntity> implements AttrGroupService {
 
     @Autowired
-    private AttrAttrgroupRelationDao attrAttrgroupRelationDao;
+    private AttrAttrgroupRelationService attrAttrgroupRelationService;
 
     @Autowired
     private AttrService attrService;
@@ -64,8 +66,8 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     }
 
     @Override
-    public List<AttrEntity> attrRelation(Long attrgroupId) {
-        List<AttrAttrgroupRelationEntity> attrAttrgroupRelationEntityList = attrAttrgroupRelationDao.selectList(
+    public List<AttrEntity> getAttrListByAttrGroupId(Long attrgroupId) {
+        List<AttrAttrgroupRelationEntity> attrAttrgroupRelationEntityList = attrAttrgroupRelationService.list(
                 new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_group_id", attrgroupId)
         );
 
@@ -79,7 +81,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Override
     public void deleteAttrRelation(AttrRelationVo[] attrRelationList) {
-        attrAttrgroupRelationDao.deleteBatch(Arrays.asList(attrRelationList));
+        attrAttrgroupRelationService.deleteBatch(Arrays.asList(attrRelationList));
     }
 
     @Override
@@ -93,7 +95,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         );
         List<Long> attrGroupIdList = attrGroupEntityList.stream().map(AttrGroupEntity::getAttrGroupId).collect(Collectors.toList());
 
-        List<AttrAttrgroupRelationEntity> attrAttrgroupRelationList = attrAttrgroupRelationDao.selectList(
+        List<AttrAttrgroupRelationEntity> attrAttrgroupRelationList = attrAttrgroupRelationService.list(
                 new QueryWrapper<AttrAttrgroupRelationEntity>().in("attr_group_id", attrGroupIdList)
         );
         List<Long> attrIdList = attrAttrgroupRelationList.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
@@ -113,6 +115,22 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
         IPage<AttrEntity> page = attrService.page(new Query<AttrEntity>().getPage(params), queryWrapper);
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<AttrGroupWithAttrsVo> getAttrGroupWithAttrsByCatelogId(Long catelogId) {
+        List<AttrGroupEntity> attrGroupEntityList = this.baseMapper.selectList(new QueryWrapper<AttrGroupEntity>().eq("catelog_id", catelogId));
+        return attrGroupEntityList.stream().map(this::toAttrGroupWithAttrsVo).collect(Collectors.toList());
+    }
+
+    private AttrGroupWithAttrsVo toAttrGroupWithAttrsVo(AttrGroupEntity attrGroupEntity) {
+        AttrGroupWithAttrsVo attrGroupWithAttrsVo = new AttrGroupWithAttrsVo();
+        BeanUtils.copyProperties(attrGroupEntity, attrGroupWithAttrsVo);
+
+        Long attrGroupId = attrGroupEntity.getAttrGroupId();
+        List<AttrEntity> attrList = getAttrListByAttrGroupId(attrGroupId);
+        attrGroupWithAttrsVo.setAttrs(attrList);
+        return attrGroupWithAttrsVo;
     }
 
 }

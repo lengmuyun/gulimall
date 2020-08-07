@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.product.service;
 
 import com.atguigu.common.utils.PageUtils;
+import com.atguigu.gulimall.product.vo.AttrGroupWithAttrsVo;
 import com.atguigu.gulimall.product.vo.AttrRelationVo;
 import com.atguigu.gulimall.product.vo.AttrResponseVo;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -29,6 +30,8 @@ public interface AttrAttrgroupRelationService extends IService<AttrAttrgroupRela
     void saveOrUpdate(Long attrId, Long attrGroupId);
 
     void saveAttrRelation(List<AttrRelationVo> relationVoList);
+
+    void deleteBatch(List<AttrRelationVo> asList);
 
 }
 
