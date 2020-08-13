@@ -1,8 +1,9 @@
 package com.atguigu.gulimall.coupon.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.atguigu.common.to.SkuReductionTo;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimall.coupon.entity.MemberPriceEntity;
+import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Map;
 
@@ -16,5 +17,8 @@ import java.util.Map;
 public interface MemberPriceService extends IService<MemberPriceEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void saveMemberPrice(SkuReductionTo skuReductionTo);
+
 }
 

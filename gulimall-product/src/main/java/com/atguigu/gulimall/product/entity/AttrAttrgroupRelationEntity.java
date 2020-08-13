@@ -37,4 +37,12 @@ public class AttrAttrgroupRelationEntity implements Serializable {
 	 */
 	private Integer attrSort;
 
+    public AttrAttrgroupRelationEntity() {
+    }
+
+    public AttrAttrgroupRelationEntity(Long attrId, Long attrGroupId) {
+        this.attrId = attrId;
+        this.attrGroupId = attrGroupId;
+    }
+
 }

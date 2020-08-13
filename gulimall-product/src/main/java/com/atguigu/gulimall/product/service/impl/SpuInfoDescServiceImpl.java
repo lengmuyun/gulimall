@@ -3,6 +3,8 @@ package com.atguigu.gulimall.product.service.impl;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,6 +26,14 @@ public class SpuInfoDescServiceImpl extends ServiceImpl<SpuInfoDescDao, SpuInfoD
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void saveDecript(Long spuId, List<String> decript) {
+        SpuInfoDescEntity spuInfoDesc = new SpuInfoDescEntity();
+        spuInfoDesc.setSpuId(spuId);
+        spuInfoDesc.setDecript(String.join(",", decript));
+        this.save(spuInfoDesc);
     }
 
 }

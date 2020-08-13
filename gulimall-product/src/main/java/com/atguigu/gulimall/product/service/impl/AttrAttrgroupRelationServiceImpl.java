@@ -39,9 +39,7 @@ public class AttrAttrgroupRelationServiceImpl extends ServiceImpl<AttrAttrgroupR
 
     @Override
     public void saveAttrAttrgroupRelation(Long attrId, Long attrGroupId) {
-        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
-        attrAttrgroupRelationEntity.setAttrId(attrId);
-        attrAttrgroupRelationEntity.setAttrGroupId(attrGroupId);
+        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity(attrId, attrGroupId);
         this.baseMapper.insert(attrAttrgroupRelationEntity);
     }
 
@@ -68,10 +66,16 @@ public class AttrAttrgroupRelationServiceImpl extends ServiceImpl<AttrAttrgroupR
 
     @Override
     public void saveOrUpdate(Long attrId, Long attrGroupId) {
-        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
-        attrAttrgroupRelationEntity.setAttrId(attrId);
-        attrAttrgroupRelationEntity.setAttrGroupId(attrGroupId);
-        this.saveOrUpdate(attrAttrgroupRelationEntity);
+        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity(attrId, attrGroupId);
+
+        QueryWrapper<AttrAttrgroupRelationEntity> qw = new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrId);
+
+        Integer count = this.baseMapper.selectCount(qw);
+        if (count == 0) {
+            this.baseMapper.insert(attrAttrgroupRelationEntity);
+        } else {
+            this.baseMapper.update(attrAttrgroupRelationEntity, qw);
+        }
     }
 
     @Override
@@ -81,9 +85,7 @@ public class AttrAttrgroupRelationServiceImpl extends ServiceImpl<AttrAttrgroupR
     }
 
     private AttrAttrgroupRelationEntity toAttrAttrgroupRelation(AttrRelationVo vo) {
-        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
-        BeanUtils.copyProperties(vo, attrAttrgroupRelationEntity);
-        return attrAttrgroupRelationEntity;
+        return new AttrAttrgroupRelationEntity(vo.getAttrId(), vo.getAttrGroupId());
     }
 
     @Override
