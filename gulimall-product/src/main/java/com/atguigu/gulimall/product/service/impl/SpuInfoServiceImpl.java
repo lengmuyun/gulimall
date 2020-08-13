@@ -21,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.Map;
@@ -71,6 +72,37 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         }
 
         skuInfoService.saveSkus(spuSaveVo, spuId);
+    }
+
+    @Override
+    public PageUtils queryPageByCondition(Map<String, Object> params) {
+        QueryWrapper<SpuInfoEntity> queryWrapper = new QueryWrapper<>();
+
+        String key = (String) params.get("key");
+        if (!StringUtils.isEmpty(key)) {
+            queryWrapper.and(qw -> qw.eq("id", key).or().like("spu_name", key));
+        }
+
+        String catelogId = (String) params.get("catelogId");
+        if (catelogId != null && !"0".equals(catelogId)) {
+            queryWrapper.eq("catalog_id", catelogId);
+        }
+
+        String brandId = (String) params.get("brandId");
+        if (brandId != null && !"0".equals(brandId)) {
+            queryWrapper.eq("brand_id", brandId);
+        }
+
+        String status = (String) params.get("status");
+        if (status != null && !"0".equals(status)) {
+            queryWrapper.eq("publish_status", status);
+        }
+
+        IPage<SpuInfoEntity> page = this.page(
+                new Query<SpuInfoEntity>().getPage(params),
+                queryWrapper
+        );
+        return new PageUtils(page);
     }
 
     private SpuBoundTo toSpuBoundTo(Long spuId, SpuSaveVo spuSaveVo) {

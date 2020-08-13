@@ -19,6 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,43 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         IPage<SkuInfoEntity> page = this.page(
                 new Query<SkuInfoEntity>().getPage(params),
                 new QueryWrapper<SkuInfoEntity>()
+        );
+
+        return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils queryPageByCondition(Map<String, Object> params) {
+        QueryWrapper<SkuInfoEntity> queryWrapper = new QueryWrapper<>();
+
+        String key = (String) params.get("key");
+        if (!StringUtils.isEmpty(key)) {
+            queryWrapper.and(qw -> qw.eq("sku_id", key).or().like("sku_name", key));
+        }
+
+        String catelogId = (String) params.get("catelogId");
+        if (catelogId != null && !"0".equals(catelogId)) {
+            queryWrapper.eq("catalog_id", catelogId);
+        }
+
+        String brandId = (String) params.get("brandId");
+        if (brandId != null && !"0".equals(brandId)) {
+            queryWrapper.eq("brand_id", brandId);
+        }
+
+        String min = (String) params.get("min");
+        if (min != null) {
+            queryWrapper.ge("price", min);
+        }
+
+        String max = (String) params.get("max");
+        if (max != null && !"0".equals(max)) {
+            queryWrapper.le("price", max);
+        }
+
+        IPage<SkuInfoEntity> page = this.page(
+                new Query<SkuInfoEntity>().getPage(params),
+                queryWrapper
         );
 
         return new PageUtils(page);
