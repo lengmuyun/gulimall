@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.ware.entity;
 
+import com.atguigu.common.constant.ware.PurchaseEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -61,5 +62,9 @@ public class PurchaseEntity implements Serializable {
 	 * 更新日期
 	 */
 	private Date updateTime;
+
+	public boolean unreceived() {
+		return status == PurchaseEnum.CREATED.getCode() || status == PurchaseEnum.ASSIGNED.getCode();
+	}
 
 }

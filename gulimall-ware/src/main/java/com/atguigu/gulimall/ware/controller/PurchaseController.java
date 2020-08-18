@@ -1,10 +1,13 @@
 package com.atguigu.gulimall.ware.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.atguigu.common.to.MergeTo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +32,41 @@ import com.atguigu.common.utils.R;
 public class PurchaseController {
     @Autowired
     private PurchaseService purchaseService;
+
+    /**
+     * 列表
+     */
+    @RequestMapping("/unreceive/list")
+    //@RequiresPermissions("ware:purchase:list")
+    public R unreceiveList(@RequestParam Map<String, Object> params){
+        PageUtils page = purchaseService.queryUnreceivePage(params);
+
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 合并整单
+     * @param mergeTo
+     * @return
+     */
+    @PostMapping("/merge")
+    public R merge(@RequestBody MergeTo mergeTo) {
+        purchaseService.merge(mergeTo);
+        return R.ok();
+    }
+
+
+    /**
+     * 领取采购单
+     * @param purchaseIds
+     * @return
+     */
+    @PostMapping("/received")
+    public R merge(@RequestBody List<Long> purchaseIds) {
+        purchaseService.receive(purchaseIds);
+        return R.ok();
+    }
+
 
     /**
      * 列表
