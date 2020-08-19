@@ -1,11 +1,11 @@
-package com.atguigu.common.to;
+package com.atguigu.gulimall.ware.vo;
 
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class MergeTo {
+public class MergeVo {
 
     /**
      * 整单id

@@ -1,6 +1,13 @@
 package com.atguigu.gulimall.ware.service.impl;
 
+import com.atguigu.common.constant.ware.PurchaseDetailEnum;
+import com.atguigu.gulimall.ware.entity.PurchaseDetailEntity;
+import com.atguigu.gulimall.ware.service.PurchaseDetailService;
+import com.atguigu.gulimall.ware.vo.PurchaseDoneVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -16,6 +23,9 @@ import org.springframework.util.StringUtils;
 
 @Service("wareSkuService")
 public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> implements WareSkuService {
+
+    @Autowired
+    private PurchaseDetailService purchaseDetailService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -37,6 +47,38 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void putInStorage(List<PurchaseDoneVo.PurchaseItemDoneVo> items) {
+        items.stream()
+                .filter(item -> item.getStatus() != PurchaseDetailEnum.FAILED.getCode())
+                .forEach(item -> {
+                    PurchaseDetailEntity purchaseDetail = purchaseDetailService.getById(item.getItemId());
+                    saveOrUpdateWareSku(purchaseDetail);
+                });
+    }
+
+    private void saveOrUpdateWareSku(PurchaseDetailEntity purchaseDetail) {
+        QueryWrapper<WareSkuEntity> queryWrapper = new QueryWrapper<WareSkuEntity>()
+                .eq("sku_id", purchaseDetail.getSkuId())
+                .eq("ware_id", purchaseDetail.getWareId());
+
+        int count = this.count(queryWrapper);
+        if (count == 0) {
+            saveWareSku(purchaseDetail);
+        } else {
+            this.baseMapper.addWareSku(purchaseDetail.getSkuId(), purchaseDetail.getWareId(), purchaseDetail.getSkuNum());
+        }
+    }
+
+    private void saveWareSku(PurchaseDetailEntity purchaseDetail) {
+        WareSkuEntity wareSku = new WareSkuEntity();
+        wareSku.setSkuId(purchaseDetail.getSkuId());
+        wareSku.setWareId(purchaseDetail.getWareId());
+        wareSku.setStock(purchaseDetail.getSkuNum());
+        wareSku.setStockLocked(0);
+        this.save(wareSku);
     }
 
 }

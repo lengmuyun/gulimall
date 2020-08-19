@@ -2,8 +2,10 @@ package com.atguigu.gulimall.ware.service.impl;
 
 import com.atguigu.common.constant.ware.PurchaseDetailEnum;
 import com.atguigu.gulimall.ware.entity.PurchaseEntity;
+import com.atguigu.gulimall.ware.vo.PurchaseDoneVo;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,6 +84,17 @@ public class PurchaseDetailServiceImpl extends ServiceImpl<PurchaseDetailDao, Pu
         updatePurchaseDetail.setId(purchaseDetailEntity.getId());
         updatePurchaseDetail.setStatus(PurchaseDetailEnum.PURCHASING.getCode());
         return updatePurchaseDetail;
+    }
+
+    @Override
+    public void updatePurchaseOrderDetail(List<PurchaseDoneVo.PurchaseItemDoneVo> items) {
+        List<PurchaseDetailEntity> updateList = items.stream().map(item -> {
+            PurchaseDetailEntity purchaseDetail = new PurchaseDetailEntity();
+            purchaseDetail.setId(item.getItemId());
+            purchaseDetail.setStatus(item.getStatus());
+            return purchaseDetail;
+        }).collect(Collectors.toList());
+        this.updateBatchById(updateList);
     }
 
 }

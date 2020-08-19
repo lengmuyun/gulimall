@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.atguigu.common.to.MergeTo;
+import com.atguigu.gulimall.ware.vo.PurchaseDoneVo;
+import com.atguigu.gulimall.ware.vo.MergeVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,12 +47,12 @@ public class PurchaseController {
 
     /**
      * 合并整单
-     * @param mergeTo
+     * @param mergeVo
      * @return
      */
     @PostMapping("/merge")
-    public R merge(@RequestBody MergeTo mergeTo) {
-        purchaseService.merge(mergeTo);
+    public R merge(@RequestBody MergeVo mergeVo) {
+        purchaseService.merge(mergeVo);
         return R.ok();
     }
 
@@ -64,6 +65,17 @@ public class PurchaseController {
     @PostMapping("/received")
     public R merge(@RequestBody List<Long> purchaseIds) {
         purchaseService.receive(purchaseIds);
+        return R.ok();
+    }
+
+
+    /**
+     * 完成采购
+     * @return
+     */
+    @PostMapping("/done")
+    public R done(@RequestBody PurchaseDoneVo purchaseDoneVo) {
+        purchaseService.finishPurchase(purchaseDoneVo);
         return R.ok();
     }
 

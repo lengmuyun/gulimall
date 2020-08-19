@@ -1,11 +1,16 @@
 package com.atguigu.gulimall.ware.service.impl;
 
+import com.atguigu.common.constant.ware.PurchaseDetailEnum;
 import com.atguigu.common.constant.ware.PurchaseEnum;
-import com.atguigu.common.to.MergeTo;
+import com.atguigu.gulimall.ware.entity.PurchaseDetailEntity;
 import com.atguigu.gulimall.ware.service.PurchaseDetailService;
+import com.atguigu.gulimall.ware.service.WareSkuService;
+import com.atguigu.gulimall.ware.vo.PurchaseDoneVo;
+import com.atguigu.gulimall.ware.vo.MergeVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +34,9 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
 
     @Autowired
     private PurchaseDetailService purchaseDetailService;
+
+    @Autowired
+    private WareSkuService wareSkuService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -54,14 +62,14 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
     }
 
     @Override
-    public void merge(MergeTo mergeTo) {
-        Long purchaseId = mergeTo.getPurchaseId();
+    public void merge(MergeVo mergeVo) {
+        Long purchaseId = mergeVo.getPurchaseId();
         if (purchaseId == null) {
             PurchaseEntity purchase = createAutoPurchase();
             purchaseId = purchase.getId();
         }
 
-        purchaseDetailService.updatePurchaseDetail(mergeTo.getItems(), purchaseId);
+        purchaseDetailService.updatePurchaseDetail(mergeVo.getItems(), purchaseId);
     }
 
     @Override
@@ -94,6 +102,42 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
         purchase.setUpdateTime(new Date());
         this.save(purchase);
         return purchase;
+    }
+
+    @Override
+    @Transactional
+    public void finishPurchase(PurchaseDoneVo purchaseDoneVo) {
+        purchaseDetailService.updatePurchaseOrderDetail(purchaseDoneVo.getItems());
+        updatePurchaseOrder(purchaseDoneVo);
+        wareSkuService.putInStorage(purchaseDoneVo.getItems());
+    }
+
+    private void updatePurchaseOrder(PurchaseDoneVo purchaseDoneVo) {
+        boolean purchaseStatus = getPurchaseStatus(purchaseDoneVo);
+        PurchaseEntity purchaseEntity = new PurchaseEntity();
+        purchaseEntity.setId(purchaseDoneVo.getId());
+        purchaseEntity.setStatus(purchaseStatus ? PurchaseEnum.FINISHED.getCode() : PurchaseEnum.ERROR.getCode());
+        purchaseEntity.setUpdateTime(new Date());
+        this.updateById(purchaseEntity);
+    }
+
+    /**
+     * 获取采购状态
+     * @param purchaseDoneVo
+     * @return
+     */
+    private boolean getPurchaseStatus(PurchaseDoneVo purchaseDoneVo) {
+        boolean purchaseStatus = true;
+
+        List<PurchaseDoneVo.PurchaseItemDoneVo> items = purchaseDoneVo.getItems();
+        for (PurchaseDoneVo.PurchaseItemDoneVo item : items) {
+            if (item.getStatus() == PurchaseDetailEnum.FAILED.getCode()) {
+                purchaseStatus = false;
+                break;
+            }
+        }
+
+        return purchaseStatus;
     }
 
 }
